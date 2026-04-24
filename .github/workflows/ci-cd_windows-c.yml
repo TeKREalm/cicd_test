@@ -34,3 +34,38 @@ jobs:
         name: windows-executable
         # 【修正】直接給予相對於專案根目錄的完整路徑，並且確認檔名是 test_app.exe
         path: for_windows/test_app.exe
+
+
+
+deploy:
+    needs: build
+    # 關鍵改變：告訴 GitHub 把這個任務派發給你的 Windows 伺服器！
+    runs-on: self-hosted 
+
+    steps:
+    - name: 下載編譯好的成品 (Artifact)
+      uses: actions/download-artifact@v4
+      with:
+        name: windows-executable
+        path: ./downloaded_exe # Runner 會自動把它下載到自己的工作資料夾內
+
+    - name: 覆蓋舊檔並執行 (PowerShell)
+      # 因為這個腳本是直接在你的伺服器上執行的，你可以直接用本機指令搬移檔案
+      run: |
+        echo "準備部署新版本..."
+        
+        # 假設你的目標資料夾是 C:\deploy_folder
+        $targetFolder = "C:\deploy_folder"
+        
+        # 如果資料夾不存在就建立一個
+        if (!(Test-Path -Path $targetFolder)) {
+            New-Item -ItemType Directory -Path $targetFolder
+        }
+        
+        # 將下載的新版 test_app.exe 複製到目標資料夾 (使用 -Force 強制覆蓋)
+        Copy-Item -Path ".\downloaded_exe\test_app.exe" -Destination "$targetFolder\test_app.exe" -Force
+        
+        echo "部署完成！檔案已更新至 $targetFolder"
+        
+        # 如果你想讓它部署完自動啟動，可以加上這一行：
+        # Start-Process -FilePath "$targetFolder\test_app.exe"
