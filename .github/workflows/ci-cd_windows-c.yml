@@ -54,8 +54,8 @@ jobs:
       run: |
         echo "準備部署新版本..."
         
-        # 假設你的目標資料夾是 C:\deploy_folder
-        $targetFolder = "C:\deploy_folder"
+        # 假設你的目標資料夾是 D:\Download\PortableGit\CI_CD_deployment
+        $targetFolder = "D:\Download\PortableGit\CI_CD_deployment"
         
         # 如果資料夾不存在就建立一個
         if (!(Test-Path -Path $targetFolder)) {
