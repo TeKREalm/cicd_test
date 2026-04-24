@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    # 指定使用 Windows 最新版的雲端虛擬機
     runs-on: windows-latest
 
     steps:
@@ -13,14 +14,23 @@ jobs:
       uses: actions/checkout@v4
 
     - name: 設定 MSVC 編譯環境
+    # 這個 Action 會幫你把 cl.exe 等編譯指令加入環境變數
       uses: ilammy/msvc-dev-cmd@v1
 
-    - name: 編譯 main.c
+    - name: 編譯 C 程式碼
       # 告訴 GitHub Actions 先切換到 for_windows 資料夾再執行 cl.exe
       working-directory: ./for_windows
       run: cl.exe /Fe:test_app.exe main.c
 
-    - name: 執行編譯出來的程式
+    - name: 執行編譯出來的程式，基礎測試
       # 同樣要在 for_windows 資料夾底下執行剛剛產生出來的 test_app.exe
       working-directory: ./for_windows
       run: .\test_app.exe
+      
+    - name: 封裝成品 (Upload Artifact)
+      # 如果編譯與測試都成功，把 .exe 檔打包存放在 GitHub 上，準備給下一個「部署」階段使用
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-executable
+        # 【修正】直接給予相對於專案根目錄的完整路徑，並且確認檔名是 test_app.exe
+        path: for_windows/test_app.exe
