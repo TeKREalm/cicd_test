@@ -37,7 +37,7 @@ jobs:
 
 
 
-deploy:
+  deploy:
     needs: build
     # 關鍵改變：告訴 GitHub 把這個任務派發給你的 Windows 伺服器！
     runs-on: self-hosted 
