@@ -3,5 +3,7 @@
 int main() {
     printf("Hello, GitHub Actions CI!\n");
     printf("Windows C Compiler is working.\n");
+	
+	printf("Ken test CD\n");
     return 0;
 }
