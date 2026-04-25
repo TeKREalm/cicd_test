@@ -1,0 +1,60 @@
+name: Linux C CI/CD Test
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-linux:
+    # 這裡改成 Ubuntu 虛擬機來編譯 Linux 執行檔
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 檢出程式碼
+      uses: actions/checkout@v4
+
+    - name: ??編譯 C 程式碼 (GCC)
+      working-directory: ./for_linux
+      # Linux 下預設就有 gcc，不需另外 setup。編譯輸出檔名不需要 .exe
+      run: gcc main.c -o test_app_linux
+
+    - name: 執行基礎測試
+      working-directory: ./for_linux
+      run: ./test_app_linux
+      
+    - name: 封裝成品 (Upload Artifact)
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-executable
+        path: for_linux/test_app_linux
+
+  deploy-linux:
+    needs: build-linux
+    # 派發給你剛剛架設好的 Linux 伺服器！
+    runs-on: self-hosted 
+
+    steps:
+    - name: 下載編譯好的成品 (Artifact)
+      uses: actions/download-artifact@v4
+      with:
+        name: linux-executable
+        path: ./downloaded_exe
+
+    - name: 賦予執行權限並部署 (Bash script)
+      # Linux 下的腳本，語法從 PowerShell 變成了 Bash
+      run: |
+        echo "準備部署 Linux 新版本..."
+        
+        # ??請根據你 Linux 伺服器的實際使用者名稱修改路徑 (例如 /home/ubuntu/deploy_folder)
+        TARGET_DIR="$HOME/CD_CI_test/ci-cd_download"
+        
+        # 如果資料夾不存在就建立一個 (mkdir -p)
+        mkdir -p $TARGET_DIR
+        
+        # 將下載的新版程式複製到目標資料夾
+        cp ./downloaded_exe/test_app_linux $TARGET_DIR/test_app_linux
+        
+        # 【重要】Linux 特性：透過網路下載的檔案會失去執行權限，必須加回來才能跑
+        chmod +x $TARGET_DIR/test_app_linux
+        
+        echo "部署完成！檔案已更新至 $TARGET_DIR"
