@@ -3,6 +3,9 @@ name: Linux C CI/CD Test
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'for_linux/**'                     # ??監控 for_linux 目錄下的所有變更
+      - '.github/workflows/linux-ci.yml'   # ??監控這份設定檔本身的變更
 
 jobs:
   build-linux:

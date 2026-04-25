@@ -3,6 +3,9 @@ name: Windows C CI Test
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'for_windows/**'                     # ??監控 for_windows 目錄下的所有變更
+      - '.github/workflows/windows-ci.yml'   # ??監控這份設定檔本身的變更
 
 jobs:
   build:
@@ -17,7 +20,7 @@ jobs:
     # 這個 Action 會幫你把 cl.exe 等編譯指令加入環境變數
       uses: ilammy/msvc-dev-cmd@v1
 
-    - name: 編譯 C 程式碼
+    - name: ??編譯 C 程式碼
       # 告訴 GitHub Actions 先切換到 for_windows 資料夾再執行 cl.exe
       working-directory: ./for_windows
       run: cl.exe /Fe:test_app.exe main.c
@@ -54,7 +57,7 @@ jobs:
       run: |
         echo "準備部署新版本..."
         
-        # 假設你的目標資料夾是 D:\Download\PortableGit\CI_CD_deployment
+        # ??假設你的目標資料夾是 D:\Download\PortableGit\CI_CD_deployment
         $targetFolder = "D:\Download\PortableGit\CI_CD_deployment"
         
         # 如果資料夾不存在就建立一個
